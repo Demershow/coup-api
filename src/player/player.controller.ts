@@ -6,9 +6,9 @@ import { CreatePlayerDto } from './dto/create-player.dto';
 export class PlayerController {
   constructor(private readonly playerService: PlayerService) { }
 
-  @Post()
+  @Post('join')
   create(@Body() dto: CreatePlayerDto) {
-    return this.playerService.create(dto);
+    return this.playerService.joinRoom(dto.userId, dto.roomCode);
   }
 
   @Get()

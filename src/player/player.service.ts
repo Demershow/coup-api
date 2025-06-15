@@ -6,8 +6,11 @@ import { CreatePlayerDto } from './dto/create-player.dto';
 export class PlayerService {
   constructor(private prisma: PrismaService) { }
 
-  async create({ userId, roomCode }: CreatePlayerDto) {
-    const room = await this.prisma.room.findUnique({ where: { code: roomCode } });
+  async joinRoom(userId: string, roomCode: string) {
+    const room = await this.prisma.room.findUnique({
+      where: { code: roomCode },
+    });
+
     if (!room) throw new NotFoundException('Sala não encontrada');
 
     const existingPlayer = await this.prisma.player.findFirst({
@@ -20,7 +23,20 @@ export class PlayerService {
     if (existingPlayer) {
       throw new ConflictException('Usuário já está na sala');
     }
+
+    const player = await this.prisma.player.create({
+      data: {
+        userId,
+        roomId: room.id,
+      },
+      include: {
+        user: true, // Se quiser retornar com os dados do usuário
+      },
+    });
+
+    return player;
   }
+
 
   async findByRoomCode(code: string) {
     const room = await this.prisma.room.findUnique({

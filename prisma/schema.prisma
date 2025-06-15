@@ -9,6 +9,7 @@ model Room {
   code      String   @unique
   createdAt DateTime @default(now())
   players   Player[]
+  Game      Game?
 }
 
 model User {
@@ -19,12 +20,74 @@ model User {
 }
 
 model Player {
-  id       String   @id @default(cuid())
-  user     User     @relation(fields: [userId], references: [id])
-  userId   String
-  room     Room     @relation(fields: [roomId], references: [id])
-  roomId   String
-  joinedAt DateTime @default(now())
+  id        String      @id @default(cuid())
+  user      User        @relation(fields: [userId], references: [id])
+  userId    String
+  room      Room        @relation(fields: [roomId], references: [id])
+  roomId    String
+  joinedAt  DateTime    @default(now())
+  Hand      Hand[]
+  Action    Action[]
+  turnOrder TurnOrder[]
+}
+
+model Game {
+  id          String      @id @default(cuid())
+  room        Room        @relation(fields: [roomId], references: [id])
+  roomId      String      @unique
+  startedAt   DateTime    @default(now())
+  currentTurn Int
+  deck        Card[]
+  hands       Hand[]
+  actions     Action[]
+  turnOrder   TurnOrder[]
+}
+
+model TurnOrder {
+  id       String @id @default(cuid())
+  game     Game   @relation(fields: [gameId], references: [id])
+  gameId   String
+  player   Player @relation(fields: [playerId], references: [id])
+  playerId String
+  position Int
+}
+
+model Card {
+  id     String   @id @default(cuid())
+  type   CardType
+  game   Game     @relation(fields: [gameId], references: [id])
+  gameId String
+  Hand   Hand[]
+}
+
+model Hand {
+  id       String  @id @default(cuid())
+  player   Player  @relation(fields: [playerId], references: [id])
+  playerId String
+  card     Card    @relation(fields: [cardId], references: [id])
+  cardId   String
+  revealed Boolean @default(false)
+  Game     Game?   @relation(fields: [gameId], references: [id])
+  gameId   String?
+}
+
+model Action {
+  id        String   @id @default(cuid())
+  game      Game     @relation(fields: [gameId], references: [id])
+  gameId    String
+  player    Player   @relation(fields: [playerId], references: [id])
+  playerId  String
+  type      String
+  createdAt DateTime @default(now())
+}
+
+enum CardType {
+  DUKE
+  ASSASSIN
+  CAPTAIN
+  CONTESSA
+  AMBASSADOR
+  INQUISITOR
 }
 
 generator client {

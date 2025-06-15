@@ -6,11 +6,14 @@ import { UserModule } from './user/user.module';
 import { PlayerModule } from './player/player.module';
 import { PrismaService } from './prisma/prisma.service';
 import { PrismaModule } from './prisma/prisma.module';
+import { GameService } from './game/game.service';
+import { GameController } from './game/game.controller';
+import { GameModule } from './game/game.module';
 
 @Module({
-  imports: [RoomModule, UserModule, PlayerModule, PrismaModule],
-  controllers: [AppController],
-  providers: [AppService, PrismaService],
+  imports: [RoomModule, UserModule, PlayerModule, PrismaModule, GameModule],
+  controllers: [AppController, GameController],
+  providers: [AppService, PrismaService, GameService],
   exports: [PrismaService]
 })
 export class AppModule { }
