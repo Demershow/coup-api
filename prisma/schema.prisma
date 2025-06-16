@@ -19,16 +19,40 @@ model User {
   players   Player[]
 }
 
+model Action {
+  id            String       @id @default(cuid())
+  type          ActionType
+  game          Game         @relation(fields: [gameId], references: [id])
+  gameId        String
+  player        Player       @relation("ActionPlayer", fields: [playerId], references: [id])
+  playerId      String
+  target        Player?      @relation("ActionTarget", fields: [targetId], references: [id])
+  targetId      String?
+  status        ActionStatus
+  response      String? // BLOCK, CHALLENGE, ACCEPT
+  // respondedBy   Player?      @relation("Responder", fields: [respondedById], references: [id])
+  respondedById String?
+
+  createdAt DateTime @default(now())
+  Player    Player   @relation(fields: [playerId], references: [id])
+
+  @@map("actions")
+}
+
 model Player {
-  id        String      @id @default(cuid())
-  user      User        @relation(fields: [userId], references: [id])
-  userId    String
-  room      Room        @relation(fields: [roomId], references: [id])
-  roomId    String
-  joinedAt  DateTime    @default(now())
-  Hand      Hand[]
-  Action    Action[]
-  turnOrder TurnOrder[]
+  id       String   @id @default(cuid())
+  user     User     @relation(fields: [userId], references: [id])
+  userId   String
+  room     Room     @relation(fields: [roomId], references: [id])
+  roomId   String
+  joinedAt DateTime @default(now())
+
+  // Relações inversas explícitas
+  actionsInitiated Action[]    @relation("ActionPlayer")
+  actionsTargeted  Action[]    @relation("ActionTarget")
+  TurnOrder        TurnOrder[]
+  Hand             Hand[]
+  Action           Action[]
 }
 
 model Game {
@@ -71,14 +95,25 @@ model Hand {
   gameId   String?
 }
 
-model Action {
-  id        String   @id @default(cuid())
-  game      Game     @relation(fields: [gameId], references: [id])
-  gameId    String
-  player    Player   @relation(fields: [playerId], references: [id])
-  playerId  String
-  type      String
-  createdAt DateTime @default(now())
+enum ActionType {
+  INCOME
+  FOREIGN_AID
+  COUP
+  TAX
+  ASSASSINATE
+  EXCHANGE
+  STEAL
+  BLOCK
+  CHALLENGE
+}
+
+enum ActionStatus {
+  PENDING
+  BLOCKED
+  CHALLENGED
+  SUCCESS
+  FAILED
+  RESOLVED
 }
 
 enum CardType {
