@@ -20,17 +20,17 @@ model User {
 }
 
 model Action {
-  id            String       @id @default(cuid())
-  type          ActionType
-  game          Game         @relation(fields: [gameId], references: [id])
-  gameId        String
-  player        Player       @relation("ActionPlayer", fields: [playerId], references: [id])
-  playerId      String
-  target        Player?      @relation("ActionTarget", fields: [targetId], references: [id])
-  targetId      String?
-  status        ActionStatus
-  response      String? // BLOCK, CHALLENGE, ACCEPT
-  // respondedBy   Player?      @relation("Responder", fields: [respondedById], references: [id])
+  id       String       @id @default(cuid())
+  type     ActionType
+  game     Game         @relation(fields: [gameId], references: [id])
+  gameId   String
+  player   Player       @relation("ActionPlayer", fields: [playerId], references: [id])
+  playerId String
+  target   Player?      @relation("ActionTarget", fields: [targetId], references: [id])
+  targetId String?
+  status   ActionStatus
+  response String? // BLOCK, CHALLENGE, ACCEPT
+
   respondedById String?
 
   createdAt DateTime @default(now())

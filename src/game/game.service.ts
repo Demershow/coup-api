@@ -9,6 +9,8 @@ import { CardType } from '@prisma/client';
 export class GameService {
   constructor(private prisma: PrismaService) { }
 
+
+
   async startGame(dto: StartGameDto) {
     const room = await this.prisma.room.findUnique({
       where: { code: dto.roomCode },
@@ -102,5 +104,29 @@ export class GameService {
       totalCardsLeft: cards.length,
     };
 
+  }
+
+  async findAll() {
+    return this.prisma.game.findMany({
+      include: {
+        room: true,
+        turnOrder: {
+          include: {
+            player: {
+              include: {
+                user: true,
+              },
+            },
+          },
+        },
+        actions: {
+          include: {
+            player: { include: { user: true } },
+            target: { include: { user: true } },
+          },
+        },
+        deck: true,
+      },
+    });
   }
 }
